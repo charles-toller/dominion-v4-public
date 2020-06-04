@@ -310,7 +310,8 @@ export default abstract class AIPlayer extends Player {
                     cardToName: decisionMatcher(decision.helperText, Texts.chooseCardToNameFor),
                     discardForPlayer: decisionMatcher(decision.helperText, Texts.chooseCardForPlayerToDiscard),
                     setAside: decisionMatcher(decision.helperText, Texts.chooseCardToSetAsideFor),
-                    playFor: decisionMatcher(decision.helperText, Texts.chooseCardToPlayFor)
+                    playFor: decisionMatcher(decision.helperText, Texts.chooseCardToPlayFor),
+                    exileFor: decisionMatcher(decision.helperText, Texts.chooseCardToExileFor)
                 };
                 if (keys.discardCard != null) {
                     return this.chooseCardFromPriority(await this.discardPriority(), decision.validChoices) as any;
@@ -323,7 +324,7 @@ export default abstract class AIPlayer extends Player {
                     const choice = await this.discardForBenefit(decision.validChoices.map((a) => a.name), keys.discardTypeForBenefit[1], keys.discardTypeForBenefit[2]) as any;
                     return decision.validChoices.find((a) => a.name === choice) as any;
                 }
-                if (keys.trashCard != null) {
+                if (keys.trashCard != null || keys.exileFor) {
                     return this.chooseCardFromPriority(await this.trashPriority(), decision.validChoices) as any;
                 }
                 if (keys.trashForBenefit) {
