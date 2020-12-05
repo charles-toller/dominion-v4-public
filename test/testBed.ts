@@ -429,16 +429,17 @@ export class TestGame extends Game {
     setDone(done: (error?) => any) {
         this.doneFn = (error?) => {
             this.done = true;
-            if ((this.players as TestPlayer[]).filter((a) => a.decisionResponses.length).length) {
-                done(new Error("Player had decisions left when game ended"));
-            }
             if (error) {
                 this.rejectPromise(error);
+                done(error);
+            }
+            else if ((this.players as TestPlayer[]).filter((a) => a.decisionResponses.length).length) {
+                done(new Error("Player had decisions left when game ended"));
             }
             else {
                 this.resolvePromise();
+                done();
             }
-            done(error);
         };
         return this.doneFn;
     }

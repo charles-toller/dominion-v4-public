@@ -1,5 +1,5 @@
-import {AST_NODE_TYPES, ESLintUtils, TSESTree} from '@typescript-eslint/experimental-utils';
-import {relative, resolve} from "path";
+import {ESLintUtils, TSESTree} from '@typescript-eslint/experimental-utils';
+import {relative, sep} from "path";
 
 const creator = ESLintUtils.RuleCreator((name) => `http://github.com/${name}`);
 function getFullPropertyPath(node: TSESTree.MemberExpression | TSESTree.Identifier): string {
@@ -52,8 +52,9 @@ module.exports = creator({
                     if (node.object.type === 'MemberExpression' || node.object.type === 'Identifier') {
                         const path = getFullPropertyPath(node);
                         if (path.split(".").slice(1).join(".") === 'data.money' && path.slice(0, 4) !== 'this') {
-                            const sourceFile = relative(resolve(__dirname, ".."), context.getFilename());
-                            if (sourceFile.slice(0, 9) !== 'src/cards') {
+                            // @ts-ignore
+                            const sourceFile: string = relative(context.getCwd(), context.getFilename());
+                            if (sourceFile.slice(0, 9) !== `src${sep}cards`) {
                                 // We don't care
                                 return;
                             }

@@ -356,15 +356,41 @@ export default class Player {
         this.game.updateCostModifiers();
         await this.events.emit('turnStart');
         await this.effects.doEffect('turnStart', Texts.chooseAnXEffectToRunNext('start of turn'), []);
-        await this.actionPhase();
-        await this.buyPhase();
-        await this.cleanup();
+        while (this.nextPhase != null) {
+            await this.runNextPhase();
+        }
+        this.nextPhase = "action";
+        this.currentPhase = null;
         await this.events.emit('turnEnd');
         await this.effects.doEffect('turnEnd', Texts.chooseAnXEffectToRunNext('turnEnd'), []);
         await this.events.emit('test_turnEndHooks');
         this.lastTurnMine = true;
         await this.effects.doEffect('afterTurn', Texts.chooseAnXEffectToRunNext('after turn'), []);
         this.data.isMyTurn = false;
+    }
+    protected exitPhaseNow = false;
+    returnToPhase(phase: "buy" | "action") {
+        if (!this.data.isMyTurn) return;
+        this.exitPhaseNow = true;
+        this.nextPhase = phase;
+    }
+    currentPhase: "action" | "buy" | "cleanup" | null = null;
+    protected nextPhase: "action" | "buy" | "cleanup" | null = "action";
+    protected async runNextPhase() {
+        this.exitPhaseNow = false;
+        this.currentPhase = this.nextPhase;
+        if (this.nextPhase === "action") {
+            this.nextPhase = "buy";
+            await this.actionPhase();
+        }
+        else if (this.nextPhase === "buy") {
+            this.nextPhase = "cleanup";
+            await this.buyPhase();
+        }
+        else if (this.nextPhase === "cleanup") {
+            this.nextPhase = null;
+            await this.cleanup();
+        }
     }
     async cleanup() {
         await this.events.emit('cleanupStart');
@@ -429,6 +455,9 @@ export default class Player {
                 }
                 this.data.playArea.push(card);
                 await this.playCard(card, null, true, true);
+                if (this.exitPhaseNow) {
+                    break;
+                }
             }
             else {
                 break;
@@ -576,15 +605,24 @@ export default class Player {
                         this.data.playArea.push(c);
                         await this.playCard(c, null, true, true);
                     }
+                    if (this.exitPhaseNow) {
+                        break;
+                    }
                 } else {
                     await this.buy(choice.choice.name);
                     break;
                 }
             }
+            if (this.exitPhaseNow) {
+                // Ruling here: http://wiki.dominionstrategy.com/index.php/Villa
+                // Ending your buy phase by returning to your action phase does not trigger "end of Buy phase" triggers
+                return;
+            }
             while (this.data.buys > 0) {
                 const choice = await this.chooseBuy();
                 if (choice.choice.name === 'End Turn') break;
                 await this.buy(choice.choice.name);
+                if (this.exitPhaseNow) return;
             }
         }
         await this.effects.doEffect('buyEnd', Texts.chooseAnXEffectToRunNext('end of Buy phase'), []);

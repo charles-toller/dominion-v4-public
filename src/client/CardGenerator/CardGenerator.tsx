@@ -107,7 +107,7 @@ export default class CardGenerator extends React.Component<IProps, {}> {
         // @ts-ignore
         sendWindowEvent('renderLandscape');
         return (
-            <svg viewBox={'0 0 1119 730'} style={{display: "flex", flex: 1, height: "75%"}}>
+            <svg viewBox={'0 0 1119 730'} style={{display: "flex", flex: 1, height: "75%", width: "100%"}}>
                 <image href={this.props.cardArtUrl} x={69} y={112} width={980} height={382} preserveAspectRatio="xMidYMin slice"/>
                 <RecolorFilter factors={this.props.factorOverrides || colorFactorLists[this.props.cardTypes[0]]} name={'color0'} />
                 <image href="/img/card-resources/EventColorOne.png" x={0} y={0} width={1119} height={730} filter="url(#color0)" />
@@ -135,7 +135,7 @@ export default class CardGenerator extends React.Component<IProps, {}> {
     renderPortrait(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
         const [type, secondaryType] = pickTypesFromTypeArray(this.props.cardTypes);
         return (
-            <svg viewBox={`0 0 1403 2151`} style={{display: "flex", flex: 1, height: "100%"}}>
+            <svg viewBox={`0 0 1403 2151`} style={{display: "flex", flex: 1, height: "100%", width: "100%"}}>
                 <RecolorFilter factors={this.props.factorOverrides || colorFactorLists[type]} name={'color0'} />
                 {secondaryType && <RecolorFilter factors={colorFactorLists[secondaryType]} name={'color1'}/>}
                 <RecolorFilter factors={colorFactorLists[type]} name={'cardGray'} offset={6} />

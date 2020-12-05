@@ -25,7 +25,8 @@ module.exports = {
     },
     "plugins": [
         "react",
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "dominion"
     ],
     "rules": {
         "semi": [
@@ -53,9 +54,9 @@ module.exports = {
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/no-empty-function": "off",
         "no-case-declarations": "off",
-        "no-vp-without-feature": ["error"],
-        "no-direct-money-access": ["error"],
-        "no-player-maps": ["error"],
+        "dominion/no-vp-without-feature": ["error"],
+        "dominion/no-direct-money-access": ["error"],
+        "dominion/no-player-maps": ["error"],
         "no-fallthrough": "off"
     }
 };
